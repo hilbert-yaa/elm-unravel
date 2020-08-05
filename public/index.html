@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+    <head> 
+        <meta charset="UTF-8">
+        <title>Main</title>
+        <style>body { padding: 0; margin: 0; }</style>
+    </head>
+    <body style="background-color:black">
+        <div class="content">
+            <div id="app" class="elm-app"></div>
+        </div>    
+        <!-- <audio autoplay loop id="bgm_0">
+            <source src="./assets/rain.mp3"> -->
+        </audio>
+        <audio autoplay loop id="bgm">
+            <source src="./assets/old city theme.mp3">
+        </audio>
+        <script src='./elm.js'></script>
+        <script>
+            document.addEventListener('click',musicPlay)
+            function musicPlay(){
+                document.getElementById('bgm').play();
+                console.log('bgm_play')
+                document.removeEventListener('click',musicPlay)
+            }
+            const audio1 = new Audio(
+                "./assets/win sound.mp3"
+            );
+            const audio2 = new Audio(
+                "./assets/roll.mp3"
+            );
+            const audio3 = new Audio(
+                "./assets/reverse.mp3"
+            );
+            const audio4 = new Audio(
+                "./assets/reverse_long.mp3"
+            );
+            const audio5 = new Audio(
+                "./assets/reverse_1.mp3"
+            );
+            const audio6 = new Audio(
+                "./assets/reverse_2.mp3"
+            );
+            const audio7 = new Audio(
+                "./assets/reverse_3.mp3"
+            );
+            const audio8 = new Audio(
+                "./assets/reverse_4.mp3"
+            );
+            const audio9 = new Audio(
+                "./assets/reverse_5.mp3"
+            );
+            var player = function (string){
+                switch (string) {
+                    case "win":{
+                        audio1.play()
+                        return
+                    }
+                    case "roll":{
+                        audio2.play()
+                        return
+                    }
+                    case "reverse":{
+                        audio3.play()
+                        return
+                    }
+                    case "reverse_long":{
+                        audio4.play()
+                        return
+                    }
+                    case "reverse_1":{
+                        audio5.play()
+                        return
+                    }
+                    case "reverse_2":{
+                        audio6.play()
+                        return
+                    }
+                    case "reverse_3":{
+                        audio7.play()
+                        return
+                    }
+                    case "reverse_4":{
+                        audio8.play()
+                        return
+                    }
+                    case "reverse_5":{
+                        audio9.play()
+                        return
+                    }
+                    case "bgm_1":{
+                        document.getElementById('bgm').volume=0.6;
+                        document.getElementById("bgm").src="./assets/bgm_1.mp3"
+                        document.getElementById("bgm").play()
+                        return                        
+                    }
+                    case "bgm_2":{
+                        document.getElementById('bgm').volume=0.4;
+                        document.getElementById("bgm").src="./assets/bgm_2.mp3"
+                        document.getElementById("bgm").play()
+                        return                                
+                    }
+                    case "bgm_3":{
+                        document.getElementById("bgm").src="./assets/bgm_3.mp3"
+                        document.getElementById("bgm").play()
+                        return                                
+                    }
+                    case "bgm_4":{
+                        document.getElementById('bgm').volume=0.4;
+                        document.getElementById("bgm").src="./assets/bgm_4.mp3"
+                        document.getElementById("bgm").play()
+                        return                                
+                    }
+                    case "bgm_5":{
+                        document.getElementById('bgm').volume=0.5;
+                        document.getElementById("bgm").src="./assets/bgm_5.mp3"
+                        document.getElementById("bgm").play()
+                        return                                
+                    }
+                    case "bgm_6":{
+                        document.getElementById('bgm').volume=0.7;
+                        document.getElementById("bgm").src="./assets/bgm_6.mp3"
+                        document.getElementById("bgm").play()
+                        return                                
+                    }
+                    case "bgm_7":{
+                        document.getElementById("bgm").src="./assets/bgm_7.mp3"
+                        document.getElementById("bgm").play()
+                        return                                
+                    }
+
+                    default: {}
+                }
+            };
+            // function bgmSwitch(string){
+            //     var bgm = document.getElementById("bgm_1");
+            //     bgm.src
+            // }
+            var app = Elm.Main.init({node: document.getElementById("app")});
+            app.ports.playSound.subscribe(player);
+            document.addEventListener('wheel',function(event){
+                app.ports.onScroll.send(event.deltaY)
+            })
+            
+        </script>
+    </body>
+</html>

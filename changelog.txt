@@ -1,0 +1,10 @@
+7-10
+add Main.elm, Update.elm View.elm Model and Block prototype
+7-11
+add Collision detect, change the Model to Point3d type
+7-15
+add multiple levels' architecture, next will focus on level design
+7-29
+modify level ideas and design text3d
+8-2
+finish levels roughly
