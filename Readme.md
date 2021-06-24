@@ -1,4 +1,4 @@
-# Unravel - p2team6
+# Unravel
 
 [![Version](https://img.shields.io/badge/unravel-1.0.0-success.svg)](http://focs.ji.sjtu.edu.cn:2143/projects/team-06/repository)
 
