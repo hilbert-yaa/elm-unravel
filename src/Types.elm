@@ -1,24 +1,23 @@
 module Types exposing (..)
 
--- 这个模块存放所有的Type Constant和Value Constant
---应避免引用任何其他自定义module
-import Text3d exposing(..)
 import Angle exposing (Angle)
 import Axis3d
 import Block3d exposing (Block3d)
 import Color exposing (Color)
+import Cylinder3d
 import Direction3d exposing (positiveZ)
-import Length exposing (Meters, Length)
+import Length exposing (Length, Meters)
 import Pixels exposing (Pixels)
 import Plane3d exposing (Plane3d)
 import Point3d exposing (Point3d)
 import Quantity exposing (Quantity)
 import Scene3d exposing (Entity)
 import Scene3d.Light exposing (Chromaticity, Light)
-import Cylinder3d
 import Scene3d.Material as Material
-import Vector3d
 import Sphere3d
+import Text3d exposing (..)
+import Vector3d
+
 
 type WorldCoordinates
     = WorldCoordinates
@@ -87,9 +86,9 @@ type Direction
     | Left
     | Right
     | R
-    | Clock--自转的两个方向
+    | Clock
     | CounterClock
-    | G --God
+    | G
 
 
 type WorldType
@@ -118,19 +117,20 @@ type alias GroundSize =
     }
 
 
-type alias Point = 
+type alias Point =
     { x : Float
     , y : Float
     , z : Float
     }
 
+
 type alias SceneSettings =
     { background : Color
-    , renderOpt : Int -- 10级渲染
+    , renderOpt : Int
     , luminance : Float
     }
 
-{- 掉落的字，不包括直接显示的字 -}
+
 type alias Text3d =
     { str : String
     , anchor : Point3d Length.Meters WorldCoordinates
@@ -141,18 +141,21 @@ type alias Text3d =
     , entities : Scene3d.Entity WorldCoordinates
     , wall : List Block
     , time : Float --animaiton time
-                   -- -1 -> text invisible, wall enabled
-                   -- -2 -> text invisible, wall disabled
+
+    -- -1 -> text invisible, wall enabled
+    -- -2 -> text invisible, wall disabled
     }
 
 
 lamp : Point3d Meters WorldCoordinates -> Float -> Scene3d.Entity WorldCoordinates
 lamp anchor angle =
     let
-        dr = Vector3d.from Point3d.origin anchor
+        dr =
+            Vector3d.from Point3d.origin anchor
+
         rod1 =
             Scene3d.cylinderWithShadow (Material.color (Color.rgb255 15 15 15)) <|
-            -- Scene3d.cylinderWithShadow (Material.color Color.darkCharcoal) <|
+                -- Scene3d.cylinderWithShadow (Material.color Color.darkCharcoal) <|
                 Cylinder3d.startingAt
                     Point3d.origin
                     Direction3d.positiveZ
@@ -172,33 +175,38 @@ lamp anchor angle =
 
         bulb =
             Scene3d.sphereWithShadow (Material.color Color.white) <|
-            Sphere3d.atPoint (Point3d.meters 1 0 5.4)
-                (Length.meters 0.25)
+                Sphere3d.atPoint (Point3d.meters 1 0 5.4)
+                    (Length.meters 0.25)
     in
-    Scene3d.group [rod1, rod2, bulb]
+    Scene3d.group [ rod1, rod2, bulb ]
         |> Scene3d.rotateAround Axis3d.z (Angle.degrees angle)
         |> Scene3d.translateBy dr
-        
+
 
 road : Point3d Meters WorldCoordinates -> Point3d Meters WorldCoordinates -> Color -> Scene3d.Entity WorldCoordinates
 road point1 point2 color =
     Scene3d.block (Material.matte color) (Block3d.from point1 point2)
 
+
 store : Point -> Entity WorldCoordinates
-store center = 
+store center =
     let
-        block = Block3d.with 
-            { x1 = Length.meters (8 + center.x)
-            , y1 = Length.meters (4 + center.y)
-            , z1 = Length.meters (6 + center.z)
-            , x2 = Length.meters (-8 + center.x)
-            , y2 = Length.meters (-4 + center.y)
-            , z2 = Length.meters (-6 + center.z)
-            }
+        block =
+            Block3d.with
+                { x1 = Length.meters (8 + center.x)
+                , y1 = Length.meters (4 + center.y)
+                , z1 = Length.meters (6 + center.z)
+                , x2 = Length.meters (-8 + center.x)
+                , y2 = Length.meters (-4 + center.y)
+                , z2 = Length.meters (-6 + center.z)
+                }
     in
-        Scene3d.blockWithShadow (Material.color Color.blue) block
+    Scene3d.blockWithShadow (Material.color Color.blue) block
+
+
 
 -- constants
+
 
 rotateRate =
     Angle.degrees 6
@@ -212,42 +220,33 @@ playerCameraDistance =
     Length.meters 20
 
 
---构建几何体类型，不含自定义module的类型
-
-
-{-| Make Text3d and the corresponding wall
-
-    第二个参数为锚点，可以随意设置
-    第三个参数是锚点所在方块的中心，其未必与锚点重合，要设为奇数
-    第四个参数为scale 可随意
-    第五个参数为绕z轴旋转，仅支持90倍数
-    最后一个参数是初始时不显示时是否占据空间
-        -1 -> text invisible, wall enabled    
-        -2 -> text invisible, wall disabled
--}
 buildText3d : String -> Point3d Meters WorldCoordinates -> Point3d Meters WorldCoordinates -> Float -> Float -> Color -> Float -> Text3d
 buildText3d str anchor firstBlockCenter scale rot color ifWallInit =
     let
-        strLength = 
+        strLength =
             List.length (String.toList str)
 
-        length = 
+        length =
             ceiling (toFloat (strLength * 6 - 1) * scale / 2)
 
-        dr = 
+        dr =
             Vector3d.from Point3d.origin firstBlockCenter
 
-        coordinates = 
-            --我寄几也读不懂了dbq
-            List.map (\yc -> Point3d.translateBy dr ( roundPoint (Point3d.rotateAround Axis3d.z (Angle.degrees rot) (Point3d.meters 0 (toFloat (2 * yc)) 0)))) (List.range 0 (length - 1))
+        coordinates =
+            List.map (\yc -> Point3d.translateBy dr (roundPoint (Point3d.rotateAround Axis3d.z (Angle.degrees rot) (Point3d.meters 0 (toFloat (2 * yc)) 0)))) (List.range 0 (length - 1))
 
         roundPoint point =
             let
-                x_ = Quantity.toFloatQuantity (Quantity.round (Point3d.xCoordinate point))
-                y_ = Quantity.toFloatQuantity (Quantity.round (Point3d.yCoordinate point))
-                z_ = Quantity.toFloatQuantity (Quantity.round (Point3d.zCoordinate point))
+                x_ =
+                    Quantity.toFloatQuantity (Quantity.round (Point3d.xCoordinate point))
+
+                y_ =
+                    Quantity.toFloatQuantity (Quantity.round (Point3d.yCoordinate point))
+
+                z_ =
+                    Quantity.toFloatQuantity (Quantity.round (Point3d.zCoordinate point))
             in
-                Point3d.xyz x_ y_ z_
+            Point3d.xyz x_ y_ z_
 
         entities =
             text3d str anchor scale { a = rot, b = 0, c = 0 }
@@ -255,31 +254,37 @@ buildText3d str anchor firstBlockCenter scale rot color ifWallInit =
         wall =
             List.map (\center -> buildColorBlock center Color.lightYellow Nothing R) coordinates
     in
-        Text3d str anchor scale rot color coordinates entities wall ifWallInit
+    Text3d str anchor scale rot color coordinates entities wall ifWallInit
+
 
 buildText3dRot : String -> Point3d Meters WorldCoordinates -> Point3d Meters WorldCoordinates -> Float -> Float -> Color -> Float -> Text3d
 buildText3dRot str anchor firstBlockCenter scale rot color ifWallInit =
     let
-        strLength = 
+        strLength =
             List.length (String.toList str)
 
-        length = 
+        length =
             ceiling (toFloat (strLength * 6 - 1) * scale / 2)
 
-        dr = 
+        dr =
             Vector3d.from Point3d.origin firstBlockCenter
 
-        coordinates = 
+        coordinates =
             --我寄几也读不懂了dbq
-            List.map (\yc -> Point3d.translateBy dr ( roundPoint (Point3d.rotateAround Axis3d.z (Angle.degrees rot) (Point3d.meters 0 (toFloat (2 * yc)) 0)))) (List.range 0 (length - 1))
+            List.map (\yc -> Point3d.translateBy dr (roundPoint (Point3d.rotateAround Axis3d.z (Angle.degrees rot) (Point3d.meters 0 (toFloat (2 * yc)) 0)))) (List.range 0 (length - 1))
 
         roundPoint point =
             let
-                x_ = Quantity.toFloatQuantity (Quantity.round (Point3d.xCoordinate point))
-                y_ = Quantity.toFloatQuantity (Quantity.round (Point3d.yCoordinate point))
-                z_ = Quantity.toFloatQuantity (Quantity.round (Point3d.zCoordinate point))
+                x_ =
+                    Quantity.toFloatQuantity (Quantity.round (Point3d.xCoordinate point))
+
+                y_ =
+                    Quantity.toFloatQuantity (Quantity.round (Point3d.yCoordinate point))
+
+                z_ =
+                    Quantity.toFloatQuantity (Quantity.round (Point3d.zCoordinate point))
             in
-                Point3d.xyz x_ y_ z_
+            Point3d.xyz x_ y_ z_
 
         entities =
             text3d str anchor scale { a = rot, b = 0, c = -90 }
@@ -287,20 +292,26 @@ buildText3dRot str anchor firstBlockCenter scale rot color ifWallInit =
         wall =
             List.map (\center -> buildColorBlock center Color.lightYellow Nothing R) coordinates
     in
-        Text3d str anchor scale rot color coordinates entities wall ifWallInit
+    Text3d str anchor scale rot color coordinates entities wall ifWallInit
+
 
 buildWall : GroundSize -> List Block
 buildWall groundSize =
     let
-        length = groundSize.l
-        width = groundSize.w
+        length =
+            groundSize.l
+
+        width =
+            groundSize.w
+
         centers =
-            List.map (\point->Point3d.meters (toFloat (2*point-1)) (2*length+1) 1) (List.range (round (-width)) (round(width+1)))
-            ++ List.map (\point->Point3d.meters (toFloat (2*point-1)) (-2*length-1) 1) (List.range (round (-width)) (round(width+1)))
-            ++ List.map (\point->Point3d.meters (2*width+1) (toFloat (2*point+1)) 1) (List.range (round (-length)) (round(length-1)))
-            ++ List.map (\point->Point3d.meters (-2*width-1) (toFloat (2*point+1)) 1) (List.range (round (-length)) (round(length-1)))
+            List.map (\point -> Point3d.meters (toFloat (2 * point - 1)) (2 * length + 1) 1) (List.range (round -width) (round (width + 1)))
+                ++ List.map (\point -> Point3d.meters (toFloat (2 * point - 1)) (-2 * length - 1) 1) (List.range (round -width) (round (width + 1)))
+                ++ List.map (\point -> Point3d.meters (2 * width + 1) (toFloat (2 * point + 1)) 1) (List.range (round -length) (round (length - 1)))
+                ++ List.map (\point -> Point3d.meters (-2 * width - 1) (toFloat (2 * point + 1)) 1) (List.range (round -length) (round (length - 1)))
     in
-        List.map (\center -> buildColorBlock center Color.lightYellow Nothing R) centers
+    List.map (\center -> buildColorBlock center Color.lightYellow Nothing R) centers
+
 
 buildBlocks : List (Point3d Meters WorldCoordinates) -> List Color -> List (Maybe Event) -> List Direction -> List Block
 buildBlocks pointList colorList eventList dirList =
@@ -310,10 +321,10 @@ buildBlocks pointList colorList eventList dirList =
 buildBlock : Point3d Meters WorldCoordinates -> Block3d Meters WorldCoordinates
 buildBlock center =
     let
-        comp = 
+        comp =
             Quantity.half blockLen
 
-        vec = 
+        vec =
             Vector3d.xyz comp comp comp
 
         v1 =
@@ -333,21 +344,6 @@ buildColorBlock center color event dir =
     in
     Block this center color event dir
 
-
--- build : Float -> Float -> Float -> Scene3d.Entity WorldCoordinates
--- build x_ y_ l_ =
---     let
---         p1 =
---             Point3d.meters 0 (x_ * l_) (y_ * l_)
-
---         p2 =
---             Point3d.meters 1 ((x_ + 1) * l_) ((y_ + 1) * l_)
-
---         block =
---             Block3d.from p1 p2
---     in
---     -- Scene3d.block (Material.color Color.white) block
---         Scene3d.blockWithShadow (Material.matte Color.white) block
 
 text3d :
     String
@@ -376,6 +372,7 @@ text3d str anchor scale rot =
         |> Scene3d.rotateAround Axis3d.y (Angle.degrees rot.b)
         |> Scene3d.rotateAround Axis3d.x (Angle.degrees rot.c)
         |> Scene3d.translateBy dr
+
 
 move : Float -> Float -> Float -> Scene3d.Entity WorldCoordinates -> Scene3d.Entity WorldCoordinates
 move dx dy dz entity =

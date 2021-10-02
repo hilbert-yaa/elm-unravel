@@ -1,15 +1,12 @@
 module Subscriptions exposing (subscriptions)
 
---Sub模块，不多说
---可能有问题 没检查Model.elm
-
-import Ports exposing (onScroll)
 import Browser.Events exposing (..)
 import Duration
 import Json.Decode as Decode exposing (Decoder)
 import Model exposing (Model)
 import Msg exposing (Msg(..))
 import Pixels exposing (Pixels)
+import Ports exposing (onScroll)
 import Types exposing (Direction(..), EventType(..), WorldType(..))
 
 
@@ -20,18 +17,18 @@ subscriptions model =
         , onResize (\w h -> Resize (Pixels.int w) (Pixels.int h))
         , onScroll Scroll
         , if model.enableMouse then
-                Sub.batch
-                    [ Browser.Events.onMouseMove mouseDecoder
-                    , Browser.Events.onMouseUp (Decode.succeed MouseUp)
-                    ]
+            Sub.batch
+                [ Browser.Events.onMouseMove mouseDecoder
+                , Browser.Events.onMouseUp (Decode.succeed MouseUp)
+                ]
 
           else
-                Browser.Events.onMouseDown (Decode.succeed MouseDown)
+            Browser.Events.onMouseDown (Decode.succeed MouseDown)
         , if model.enableKey then
-                Browser.Events.onKeyDown keyDecoder1
+            Browser.Events.onKeyDown keyDecoder1
 
           else
-                Browser.Events.onKeyUp (Decode.succeed KeyUp)
+            Browser.Events.onKeyUp (Decode.succeed KeyUp)
         ]
 
 
@@ -104,12 +101,9 @@ keyMapping1 raw =
 
         "Escape" ->
             Decode.succeed (Pause True)
-        
+
         "=" ->
             Decode.succeed (Switch 1)
 
         _ ->
             Decode.fail "????"
-
-
-

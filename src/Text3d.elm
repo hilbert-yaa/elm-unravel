@@ -1,26 +1,30 @@
-module Text3d exposing(..)
+module Text3d exposing (..)
 
-import Scene3d
-import Point3d
 import Block3d
-import Scene3d.Material as Material
 import Color exposing (Color)
+import Point3d
+import Scene3d
+import Scene3d.Material as Material
 
 
 len =
     1
 
+
 bd : Float -> Float -> Scene3d.Entity a
 bd x_ y_ =
     build (x_ - 1) (y_ - 1) len 1 1
+
 
 bdh : Float -> Float -> Float -> Scene3d.Entity a
 bdh x_ y_ l_ =
     build (x_ - 1) (y_ - 1) len l_ 1
 
+
 bdv : Float -> Float -> Float -> Scene3d.Entity a
 bdv x_ y_ l_ =
     build (x_ - 1) (y_ - 1) len 1 l_
+
 
 build : Float -> Float -> Float -> Float -> Float -> Scene3d.Entity a
 build x_ y_ l_ w_ h_ =
@@ -35,6 +39,7 @@ build x_ y_ l_ w_ h_ =
             Block3d.from p1 p2
     in
     Scene3d.block (Material.color Color.white) block
+
 
 a =
     Scene3d.group
@@ -534,7 +539,10 @@ sp =
     Scene3d.group []
 
 
+
 -- parser : Char -> Scene3d.Entity WorldCoordinates
+
+
 parser ch =
     case ch of
         'a' ->
