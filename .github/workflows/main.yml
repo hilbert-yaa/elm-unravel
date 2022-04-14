@@ -22,7 +22,7 @@ jobs:
         elm-version: 0.19.1
     - uses: actions/checkout@v2
     - run: mkdir -p build
-    - run: cp -rf public build
+    - run: cp public/index.html build
     - run: cp -rf assets build
     - run: elm make src/Main.elm --output build/elm.js
     - name: Deploy to GitHub Pages
