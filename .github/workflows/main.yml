@@ -22,7 +22,7 @@ jobs:
       with:
         elm-version: 0.19.1
     - run: mkdir -p build
-    - run: cp public/* build
+    - run: cp -rf public build
     - run: cp -rf assets build
     - run: elm make src/Main.elm --output build/elm.js
     - name: Deploy to GitHub Pages
