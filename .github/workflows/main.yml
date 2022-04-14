@@ -1,0 +1,36 @@
+# This is a workflow to build and deploy the unravel project to Github Pages 
+
+name: Deploy to GitHub Pages
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    steps:
+    - uses: jorelali/setup-elm@v3
+      with:
+        elm-version: 0.19.1
+    - run: mkdir -p build
+    - run: cp public/* build
+    - run: cp -rf assets build
+    - run: elm make src/Main.elm --output build/elm.js
+    - name: Deploy to GitHub Pages
+      if: success()
+      uses: crazy-max/ghaction-github-pages@v2
+      with:
+        target_branch: gh-pages
+        build_dir: build
+        keep_history: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
