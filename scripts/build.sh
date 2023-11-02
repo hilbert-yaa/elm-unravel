@@ -6,7 +6,8 @@ js="build/elm.js"
 
 mkdir -p build
 
-cp -r public/index.html build/
+cp -rf public/* build/
+
 elm make --output=$js src/Main.elm
 
-cp -rf assets build
+cp -rf assets build/
