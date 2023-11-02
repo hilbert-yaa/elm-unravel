@@ -31,6 +31,11 @@ import Types exposing (..)
 import Vector3d exposing (Vector3d)
 
 
+noCmd : Model -> ( Model, Cmd msg )
+noCmd model =
+    ( model, Cmd.none )
+
+
 
 -- preUpdate
 
@@ -39,28 +44,33 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Resize w h ->
-            ( { model | screen = { width = w, height = h } }, Cmd.none )
+            { model | screen = { width = w, height = h } } |> noCmd
 
         Scroll dy ->
             let
                 camera =
                     model.camera
 
-                newDis =
-                    if dy > 0 then
-                        camera.distance
-                            |> Quantity.plus (Length.meters 0.8)
-                            |> Quantity.clamp (Length.meters 5) (Length.meters 50)
-                        --加一个距离范围
+                min_dist =
+                    5 |> Length.meters
 
-                    else
-                        camera.distance
-                            |> Quantity.minus (Length.meters 0.8)
-
-                newCam =
-                    { camera | distance = newDis }
+                max_dist =
+                    50 |> Length.meters
             in
-            ( { model | camera = newCam }, Cmd.none )
+            let
+                delta_dist =
+                    (if dy > 0 then
+                        0.8
+
+                     else
+                        -0.8
+                    )
+                        |> Length.meters
+
+                distance =
+                    model.camera.distance |> Quantity.plus delta_dist |> Quantity.clamp min_dist max_dist
+            in
+            { model | camera = { camera | distance = distance } } |> noCmd
 
         Switch _ ->
             if model.gameStatus == Play then
@@ -74,13 +84,13 @@ update msg model =
                     newSelf =
                         { self | center = model.goal.center, this = newThis }
                 in
-                ( { model | self = newSelf }, Cmd.none )
+                { model | self = newSelf } |> noCmd
 
             else
-                ( model, Cmd.none )
+                model |> noCmd
 
         Pause esc ->
-            ( model |> updatePause esc, Cmd.none )
+            model |> updatePause esc |> noCmd
 
         _ ->
             updateGame msg model
@@ -107,31 +117,31 @@ updateGame msg model =
                         newScene =
                             { scene | renderOpt = renderOpt }
                     in
-                    ( { model | scene = newScene }, Cmd.none )
+                    { model | scene = newScene } |> noCmd
 
                 _ ->
-                    ( model, Cmd.none )
+                    model |> noCmd
 
         PrePreGame time duration ->
             case msg of
                 Tick _ ->
                     if time > duration then
-                        ( { model | gameStatus = PreGame 0 600 }, Cmd.none )
+                        { model | gameStatus = PreGame 0 600 } |> noCmd
 
                     else
-                        ( { model | gameStatus = PrePreGame (time + 1) duration }, Cmd.none )
+                        { model | gameStatus = PrePreGame (time + 1) duration } |> noCmd
 
                 MouseDown ->
-                    ( { model | enableMouse = True }, Cmd.none )
+                    { model | enableMouse = True } |> noCmd
 
                 MouseUp ->
-                    ( { model | enableMouse = False }, Cmd.none )
+                    { model | enableMouse = False } |> noCmd
 
                 MouseMove dx dy ->
-                    ( updateElevationAzimuth dx dy model, Cmd.none )
+                    updateElevationAzimuth dx dy model |> noCmd
 
                 _ ->
-                    ( model, Cmd.none )
+                    model |> noCmd
 
         PreGame time duration ->
             case msg of
@@ -153,88 +163,88 @@ updateGame msg model =
                                 )
 
                     else
-                        ( { model | gameStatus = PreGame (time + 1) duration }, Cmd.none )
+                        { model | gameStatus = PreGame (time + 1) duration } |> noCmd
 
                 _ ->
-                    ( model, Cmd.none )
+                    model |> noCmd
 
         StartFadeIn time duration ->
             case msg of
                 Tick _ ->
                     if time > duration then
-                        ( { model | gameStatus = Play }, Cmd.none )
+                        { model | gameStatus = Play } |> noCmd
 
                     else
-                        ( { model | gameStatus = StartFadeIn (time + 1) duration }, Cmd.none )
+                        { model | gameStatus = StartFadeIn (time + 1) duration } |> noCmd
 
                 MouseDown ->
-                    ( { model | enableMouse = True }, Cmd.none )
+                    { model | enableMouse = True } |> noCmd
 
                 MouseUp ->
-                    ( { model | enableMouse = False }, Cmd.none )
+                    { model | enableMouse = False } |> noCmd
 
                 MouseMove dx dy ->
-                    ( updateElevationAzimuth dx dy model, Cmd.none )
+                    updateElevationAzimuth dx dy model |> noCmd
 
                 _ ->
-                    ( model, Cmd.none )
+                    model |> noCmd
 
         Interlude time duration originalElevation originalDistance originalAzimuth ->
             case msg of
                 Tick _ ->
                     case model.level of
                         6 ->
-                            ( updateInterlude6 time duration originalElevation originalDistance originalAzimuth model, Cmd.none )
+                            updateInterlude6 time duration originalElevation originalDistance originalAzimuth model |> noCmd
 
                         3 ->
-                            ( updateInterlude3 time duration originalElevation originalDistance originalAzimuth model, Cmd.none )
+                            updateInterlude3 time duration originalElevation originalDistance originalAzimuth model |> noCmd
 
                         4 ->
                             updateInterlude4 time duration originalElevation originalDistance originalAzimuth model
 
                         _ ->
-                            ( model, Cmd.none )
+                            model |> noCmd
 
                 _ ->
-                    ( model, Cmd.none )
+                    model |> noCmd
 
         Animation frame ->
             case msg of
                 Tick _ ->
                     case model.level of
                         0 ->
-                            ( updateAnimation0 model, Cmd.none )
+                            updateAnimation0 model |> noCmd
 
                         1 ->
                             updateAnimation1 model frame
 
                         4 ->
-                            ( updateAnimation4 model frame, Cmd.none )
+                            updateAnimation4 model frame |> noCmd
 
                         6 ->
-                            ( updateAnimation6 model frame, Cmd.none )
+                            updateAnimation6 model frame |> noCmd
 
                         _ ->
-                            ( model, Cmd.none )
+                            model |> noCmd
 
                 MouseDown ->
-                    ( { model | enableMouse = True }, Cmd.none )
+                    { model | enableMouse = True } |> noCmd
 
                 MouseUp ->
-                    ( { model | enableMouse = False }, Cmd.none )
+                    { model | enableMouse = False } |> noCmd
 
                 MouseMove dx dy ->
-                    ( updateElevationAzimuth dx dy model, Cmd.none )
+                    updateElevationAzimuth dx dy model |> noCmd
 
                 _ ->
-                    ( model, Cmd.none )
+                    model |> noCmd
 
         Lose ->
             if model.self.event /= Nothing then
                 updateModelMsg model
 
             else
-                ( { model | gameStatus = LoseFadeOut 15 15 }, Cmd.none )
+                { model | gameStatus = LoseFadeOut 15 15 } |> noCmd
 
         LoseFadeOut time duration ->
             case msg of
@@ -262,19 +272,19 @@ updateGame msg model =
                         ( restartModel, restartMsg )
 
                     else
-                        ( { model | gameStatus = LoseFadeOut (time - 1) duration }, Cmd.none )
+                        { model | gameStatus = LoseFadeOut (time - 1) duration } |> noCmd
 
                 MouseDown ->
-                    ( { model | enableMouse = True }, Cmd.none )
+                    { model | enableMouse = True } |> noCmd
 
                 MouseUp ->
-                    ( { model | enableMouse = False }, Cmd.none )
+                    { model | enableMouse = False } |> noCmd
 
                 MouseMove dx dy ->
-                    ( updateElevationAzimuth dx dy model, Cmd.none )
+                    updateElevationAzimuth dx dy model |> noCmd
 
                 _ ->
-                    ( model, Cmd.none )
+                    model |> noCmd
 
         LevelChange newLevel ->
             if newLevel == 2 then
@@ -284,7 +294,7 @@ updateGame msg model =
                 reInit { model | level = newLevel }
 
             else
-                ( { model | gameStatus = WinFadeOut newLevel 40 40 }, Cmd.none )
+                { model | gameStatus = WinFadeOut newLevel 40 40 } |> noCmd
 
         WinFadeOut newLevel time duration ->
             case msg of
@@ -293,19 +303,19 @@ updateGame msg model =
                         reInit { model | level = newLevel }
 
                     else
-                        ( { model | gameStatus = WinFadeOut newLevel (time - 1) duration }, Cmd.none )
+                        { model | gameStatus = WinFadeOut newLevel (time - 1) duration } |> noCmd
 
                 MouseDown ->
-                    ( { model | enableMouse = True }, Cmd.none )
+                    { model | enableMouse = True } |> noCmd
 
                 MouseUp ->
-                    ( { model | enableMouse = False }, Cmd.none )
+                    { model | enableMouse = False } |> noCmd
 
                 MouseMove dx dy ->
-                    ( updateElevationAzimuth dx dy model, Cmd.none )
+                    updateElevationAzimuth dx dy model |> noCmd
 
                 _ ->
-                    ( model, Cmd.none )
+                    model |> noCmd
 
         _ ->
             case msg of
@@ -329,10 +339,10 @@ updateGame msg model =
                                     { oldCamera | distance = playerCameraDistance }
                             in
                             if model.godMode then
-                                ( { model | godMode = False, enableKey = False, camera = playerCamera } |> updateFocalPoint, Cmd.none )
+                                { model | godMode = False, enableKey = False, camera = playerCamera } |> updateFocalPoint |> noCmd
 
                             else
-                                ( { model | godMode = True, enableKey = False, camera = godCamera }, Cmd.none )
+                                { model | godMode = True, enableKey = False, camera = godCamera } |> noCmd
 
                         _ ->
                             -- ↑↓←→WASD
@@ -340,22 +350,22 @@ updateGame msg model =
                                 newKey =
                                     updateKey key model
                             in
-                            ( { model | enableKey = False } |> updateWhenMove newKey, Cmd.none )
+                            { model | enableKey = False } |> updateWhenMove newKey |> noCmd
 
                 KeyUp ->
-                    ( { model | enableKey = True }, Cmd.none )
+                    { model | enableKey = True } |> noCmd
 
                 MouseDown ->
-                    ( { model | enableMouse = True }, Cmd.none )
+                    { model | enableMouse = True } |> noCmd
 
                 MouseUp ->
-                    ( { model | enableMouse = False }, Cmd.none )
+                    { model | enableMouse = False } |> noCmd
 
                 MouseMove dx dy ->
-                    ( updateElevationAzimuth dx dy model, Cmd.none )
+                    updateElevationAzimuth dx dy model |> noCmd
 
                 _ ->
-                    ( model, Cmd.none )
+                    model |> noCmd
 
 
 
@@ -758,7 +768,7 @@ updateText3dStart model =
         preModel =
             { model | self = preSelf }
 
-        ( newModel1, texts ) =
+        ( _, texts ) =
             if modBy period model.time == 0 then
                 List.foldl findFallText ( preModel, [] ) preModel.texts3d
 
@@ -1090,7 +1100,7 @@ checkReverse model =
         )
 
     else
-        ( { model | enableKey = False }, Cmd.none )
+        { model | enableKey = False } |> noCmd
 
 
 findFallText : Text3d -> ( Model, List Text3d ) -> ( Model, List Text3d )
