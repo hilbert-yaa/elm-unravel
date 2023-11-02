@@ -6,6 +6,9 @@ build: public/* src/* src/**/*
 build-opt: public/* src/* src/**/*
 	bash scripts/build-opt.sh
 
+test:
+	elm-test
+
 .PHONY: clean
 clean:
 	rm -rf build/
