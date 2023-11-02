@@ -1,19 +1,13 @@
 module Model exposing (..)
 
-import Angle exposing (Angle)
-import Axis3d exposing (Axis3d)
-import Block3d exposing (Block3d)
-import Browser.Dom
-import Color exposing (Color)
+import Angle 
+import Color 
 import Cylinder3d exposing (..)
-import Direction3d
-import Length exposing (Meters)
+import Length
 import Msg exposing (Msg(..))
-import Point3d exposing (Point3d, coordinates, xCoordinate, yCoordinate, zCoordinate)
+import Point3d
 import Quantity
 import Scene3d exposing (Entity)
-import Scene3d.Material as Material
-import Sphere3d
 import Types exposing (..)
 import Vector3d
 
@@ -54,8 +48,6 @@ type alias Model =
 actives : List Block
 actives =
     let
-        p1 =
-            Point3d.meters 5 -19 1
 
         blocks =
             List.map (\center -> buildColorBlock center Color.lightGray Nothing Up) []
