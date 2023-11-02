@@ -132,10 +132,6 @@
                     default: {}
                 }
             };
-            // function bgmSwitch(string){
-            //     var bgm = document.getElementById("bgm_1");
-            //     bgm.src
-            // }
             var app = Elm.Main.init({node: document.getElementById("app")});
             app.ports.playSound.subscribe(player);
             document.addEventListener('wheel',function(event){
