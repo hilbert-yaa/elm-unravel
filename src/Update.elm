@@ -1,8 +1,8 @@
 module Update exposing (update)
 
 import Angle exposing (Angle)
-import Axis3d exposing (Axis3d)
-import Block3d exposing (Block3d)
+import Axis3d
+import Block3d
 import Browser.Dom
 import Color exposing (Color)
 import Direction3d
@@ -20,7 +20,6 @@ import Level6.Text
 import Model exposing (Model)
 import Msg exposing (Msg(..))
 import Pixels exposing (Pixels)
-import Plane3d exposing (Plane3d)
 import Point3d exposing (Point3d)
 import Ports exposing (..)
 import Quantity
@@ -28,7 +27,7 @@ import Scene3d
 import SketchPlane3d
 import Task
 import Types exposing (..)
-import Vector3d exposing (Vector3d)
+import Vector3d
 
 
 noCmd : Model -> ( Model, Cmd msg )
@@ -1029,10 +1028,10 @@ examTextFall key model =
                 preModel =
                     { model | self = preSelf }
 
-                ( newModel1, texts ) =
+                ( _, texts ) =
                     List.foldl editTextHelper6 ( preModel, [] ) preModel.texts3d
 
-                ( newModel2, textsRev ) =
+                ( _, textsRev ) =
                     List.foldl editTextHelper6 ( preModel, [] ) preModel.texts3dRev
             in
             { model | texts3d = texts, texts3dRev = textsRev }
@@ -1045,10 +1044,10 @@ examTextFall key model =
                 preModel =
                     { model | self = preSelf }
 
-                ( newModel1, texts ) =
+                ( _, texts ) =
                     List.foldl editTextHelper ( preModel, [] ) preModel.texts3d
 
-                ( newModel2, textsRev ) =
+                ( _, textsRev ) =
                     List.foldl editTextHelper ( preModel, [] ) preModel.texts3dRev
             in
             { model | texts3d = texts, texts3dRev = textsRev }
@@ -1432,7 +1431,7 @@ updateWarning model =
                 distance =
                     Quantity.minimum (List.map (\block -> blockDistance model.self block) model.actives) |> Maybe.withDefault (Length.meters 0)
 
-                ( r, rgb ) =
+                ( r, _ ) =
                     if Quantity.lessThan threshold distance then
                         ( Length.meters (toFloat model.time * 0.05 / 1500)
                         , Color.rgb
@@ -1463,12 +1462,6 @@ updateWarning model =
 
                 originalColor =
                     model.scene.background
-
-                originalScene =
-                    model.scene
-
-                newScene =
-                    { originalScene | background = rgb }
             in
             { model | camera = newCamera }
 
@@ -1773,10 +1766,10 @@ transformCar car walls =
         distance =
             Point3d.distanceFrom wall.center car.center
 
-        ( x1, y1, z1 ) =
+        ( x1, _, _ ) =
             Point3d.toTuple Length.inInches wall.center
 
-        ( x, y, z ) =
+        ( x, _, _ ) =
             Point3d.toTuple Length.inInches car.center
 
         moveVector =
@@ -1821,13 +1814,13 @@ deleteCars cars point1 point2 =
 deleteCar : Block -> Point3d Meters WorldCoordinates -> Point3d Meters WorldCoordinates -> Bool
 deleteCar car point1 point2 =
     let
-        ( x1, y1, z1 ) =
+        ( x1, y1, _ ) =
             Point3d.toTuple Length.inInches point1
 
-        ( x2, y2, z2 ) =
+        ( x2, y2, _ ) =
             Point3d.toTuple Length.inInches point2
 
-        ( x, y, z ) =
+        ( x, y, _ ) =
             Point3d.toTuple Length.inInches car.center
     in
     not (x >= x1 && x <= x2 && y >= y1 && y <= y2)
@@ -2353,7 +2346,7 @@ updateBlock model block =
                 --update the event to ( (Something duration--) or Nothing )
             in
             case event.name of
-                Rotate dir ->
+                Rotate _ ->
                     let
                         newBlock =
                             block
@@ -2522,7 +2515,7 @@ ifNextStepAvailable block dir model =
                 \cube -> Quantity.lessThanOrEqualTo (Length.meters 1.99) (Point3d.distanceFrom exPoint cube.center) && Quantity.greaterThanOrEqualTo (Length.meters 0) (Point3d.distanceFrom exPoint cube.center)
 
             object =
-                model.actives ++ model.nactives ++ model.wall ++ texts3d ++ [ model.self ] ++ model.cars
+                model.actives ++ model.nactives ++ model.wall ++ texts3d ++ model.self :: model.cars
         in
         not <| List.any helper object
 
