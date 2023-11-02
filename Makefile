@@ -1,9 +1,9 @@
-all: build-opt
+all: build
 
-build:
+build: public/* src/* src/**/*
 	bash scripts/build.sh
 
-build-opt:
+build-opt: public/* src/* src/**/*
 	bash scripts/build-opt.sh
 
 .PHONY: clean
