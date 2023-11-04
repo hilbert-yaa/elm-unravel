@@ -199,7 +199,7 @@ init =
       , goal = { center = initGoal }
       , level = 5
       , world = Normal
-      , gameStatus = PreGame 1 600
+      , gamePhase = PreGame 1 600
       , groundSize = groundSize
       , mapSize = mapSize
       , godMode = False
@@ -215,23 +215,3 @@ init =
       }
     , playSound "bgm_5"
     )
-
-
-buildStore : Point -> List (Entity WorldCoordinates)
-buildStore center =
-    let
-        block1 =
-            Block3d.with
-                { x1 = Length.meters (8 + center.x)
-                , y1 = Length.meters (4 + center.y)
-                , z1 = Length.meters (6 + center.z)
-                , x2 = Length.meters (-8 + center.x)
-                , y2 = Length.meters (-4 + center.y)
-                , z2 = Length.meters (-6 + center.z)
-                }
-    in
-    let
-        blocks =
-            List.map (\block -> Scene3d.blockWithShadow (Material.color Color.blue) block) [ block1 ]
-    in
-    List.foldr List.append [] [ blocks ]

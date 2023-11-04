@@ -161,8 +161,9 @@ settings =
             , lamp (Point3d.meters -8 -60 0) 0
             ]
 
+        store_center = Point3d.meters 0 40 0
         store =
-            buildStore (Point 0 40 0)
+            buildStore store_center
 
         text1 =
             text3d "store" (Point3d.meters -3.5 33.3 5) 0.25 { a = 270, b = 0, c = 0 }
@@ -282,7 +283,7 @@ init =
       , goal = { center = initGoal }
       , level = 1
       , world = Normal
-      , gameStatus = PreGame 1 600 --600
+      , gamePhase = PreGame 1 600 --600
       , groundSize = groundSize
       , mapSize = mapSize
       , godMode = False
@@ -300,17 +301,14 @@ init =
     )
 
 
-buildStore : Point -> List (Entity WorldCoordinates)
+buildStore : Point3d Meters WorldCoordinates -> List (Entity WorldCoordinates)
 buildStore center =
     let
-        x =
-            center.x
+        x = Point3d.xCoordinate center |> Length.inMeters
 
-        y =
-            center.y
+        y = Point3d.yCoordinate center |> Length.inMeters
 
-        z =
-            center.z
+        z = Point3d.zCoordinate center |> Length.inMeters
 
         block1 =
             Block3d.from (Point3d.meters (x - 10) (y - 6) (z + 7)) (Point3d.meters (x + 10) (y + 6) (z + 8))

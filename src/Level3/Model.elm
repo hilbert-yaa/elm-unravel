@@ -219,7 +219,7 @@ init =
       , goal = { center = initGoal }
       , level = 3
       , world = Normal
-      , gameStatus = PreGame 1 600
+      , gamePhase = PreGame 1 600
       , groundSize = groundSize
       , godMode = False
       , text = initText

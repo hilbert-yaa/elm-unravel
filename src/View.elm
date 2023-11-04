@@ -89,7 +89,7 @@ renderGame model =
                                 Color.black
 
                             else
-                                case model.gameStatus of
+                                case model.gamePhase of
                                     Play ->
                                         Color.rgb255 rgb rgb rgb
 
@@ -126,7 +126,7 @@ renderGame model =
                                 Color.black
 
                             else
-                                case model.gameStatus of
+                                case model.gamePhase of
                                     Play ->
                                         Color.rgb255 r g b
 
@@ -198,7 +198,7 @@ renderGame model =
             switchLight model
 
         opacity =
-            case model.gameStatus of
+            case model.gamePhase of
                 Interlude time duration _ _ _ ->
                     if model.level == 4 && time >= 700 then
                         "0"
@@ -244,7 +244,7 @@ preGameView model =
             0.1
 
         alpha =
-            case model.gameStatus of
+            case model.gamePhase of
                 PreGame time duration ->
                     if time < fade * duration then
                         time / (fade * duration)
@@ -449,7 +449,7 @@ renderText model =
 
 renderEscMenu : GameState -> Html Msg
 renderEscMenu model =
-    if model.gameStatus == Paused then
+    if model.gamePhase == Paused then
         let
             renderOpt =
                 model.scene.renderOpt
@@ -521,7 +521,7 @@ view model =
                 toFloat model.frameTime / 100
 
             else
-                case model.gameStatus of
+                case model.gamePhase of
                     LoseFadeOut time duration ->
                         time / duration
 
@@ -564,7 +564,7 @@ view model =
                 , style "background-color" "white"
                 , style "opacity" "0"
                 ]
-                [-- text <| ("time: " ++ Debug.toString model.gameStatus)
+                [-- text <| ("time: " ++ Debug.toString model.gamePhase)
                  -- , br[][]
                  -- , text <| ("azimuth: " ++ Debug.toString model.self)
                  -- , br[][]
@@ -899,7 +899,7 @@ switchLight model =
                     Point3d.toRecord Length.inMeters (Block3d.centerPoint model.self.this)
 
                 light1 =
-                    case model.gameStatus of
+                    case model.gamePhase of
                         Interlude time duration _ _ _ ->
                             if time > 0.125 * duration && time <= 0.25 * duration then
                                 Light.point (Light.castsShadows True)
@@ -930,7 +930,7 @@ switchLight model =
                                 }
 
                 softLighting =
-                    case model.gameStatus of
+                    case model.gamePhase of
                         Interlude time duration _ _ _ ->
                             if time > 0.125 * duration && time <= 0.25 * duration then
                                 Light.soft
@@ -980,7 +980,7 @@ switchLight model =
                     Point3d.toRecord Length.inMeters (Block3d.centerPoint model.self.this)
 
                 light1 =
-                    case model.gameStatus of
+                    case model.gamePhase of
                         Interlude time duration _ _ _ ->
                             if time > 0.125 * duration && time <= 0.25 * duration then
                                 Light.point (Light.castsShadows True)
@@ -1070,7 +1070,7 @@ switchLight model =
                         1.5
 
                     else
-                        case model.gameStatus of
+                        case model.gamePhase of
                             Play ->
                                 max
 

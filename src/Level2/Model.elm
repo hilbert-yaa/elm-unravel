@@ -223,7 +223,7 @@ init =
       , goal = { center = initGoal }
       , level = 2
       , world = Normal
-      , gameStatus = PrePreGame 0 200
+      , gamePhase = PrePreGame 0 200
       , groundSize = groundSize
       , mapSize = mapSize
       , godMode = False

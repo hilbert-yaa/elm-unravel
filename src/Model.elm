@@ -29,7 +29,7 @@ type alias GameState =
     , goal : Goal
     , level : Int
     , world : WorldType
-    , gameStatus : GamePhase
+    , gamePhase : GamePhase
     , groundSize : GroundSize
     , mapSize : GroundSize
     , godMode : Bool
@@ -165,7 +165,7 @@ init =
       , goal = { center = initGoal }
       , level = 0
       , world = Normal
-      , gameStatus = PreGame 1 600
+      , gamePhase = PreGame 1 600
       , groundSize = groundSize
       , mapSize = mapSize
       , godMode = False

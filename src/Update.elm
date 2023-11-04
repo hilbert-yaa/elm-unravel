@@ -9,14 +9,14 @@ import Common exposing (noCmd)
 import Direction3d
 import Event exposing (keyToEvent, rotateBlock, stampBlock, updateEvent)
 import Length exposing (Length, Meters)
-import Level1.Model
+import Level1.Model exposing(buildStore)
 import Level1.Text
 import Level2.Model
 import Level3.Model
 import Level4.Model
 import Level5.Model
+import Level6.Model
 import Level5.Text
-import Level6.Model exposing (buildStore)
 import Level6.Text
 import Model exposing (GameState)
 import Msg exposing (Msg(..))
@@ -68,7 +68,7 @@ update msg model =
             { model | camera = { camera | distance = distance } } |> noCmd
 
         Switch _ ->
-            if model.gameStatus == Play then
+            if model.gamePhase == Play then
                 let
                     self =
                         model.self
@@ -93,7 +93,7 @@ update msg model =
 
 updateGame : Msg -> GameState -> ( GameState, Cmd Msg )
 updateGame msg model =
-    case model.gameStatus of
+    case model.gamePhase of
         Paused ->
             case msg of
                 Option opt ->
@@ -121,10 +121,10 @@ updateGame msg model =
             case msg of
                 Tick _ ->
                     if time > duration then
-                        { model | gameStatus = PreGame 0 600 } |> noCmd
+                        { model | gamePhase = PreGame 0 600 } |> noCmd
 
                     else
-                        { model | gameStatus = PrePreGame (time + 1) duration } |> noCmd
+                        { model | gamePhase = PrePreGame (time + 1) duration } |> noCmd
 
                 MouseDown ->
                     { model | enableMouse = True } |> noCmd
@@ -144,10 +144,10 @@ updateGame msg model =
                     if time > duration then
                         case model.level of
                             2 ->
-                                ( { model | gameStatus = Play }, playSound "bgm_2" )
+                                ( { model | gamePhase = Play }, playSound "bgm_2" )
 
                             _ ->
-                                ( { model | gameStatus = StartFadeIn 0 25 }
+                                ( { model | gamePhase = StartFadeIn 0 25 }
                                 , Task.perform
                                     (\{ viewport } ->
                                         Resize
@@ -158,7 +158,7 @@ updateGame msg model =
                                 )
 
                     else
-                        { model | gameStatus = PreGame (time + 1) duration } |> noCmd
+                        { model | gamePhase = PreGame (time + 1) duration } |> noCmd
 
                 _ ->
                     model |> noCmd
@@ -167,10 +167,10 @@ updateGame msg model =
             case msg of
                 Tick _ ->
                     if time > duration then
-                        { model | gameStatus = Play } |> noCmd
+                        { model | gamePhase = Play } |> noCmd
 
                     else
-                        { model | gameStatus = StartFadeIn (time + 1) duration } |> noCmd
+                        { model | gamePhase = StartFadeIn (time + 1) duration } |> noCmd
 
                 MouseDown ->
                     { model | enableMouse = True } |> noCmd
@@ -239,7 +239,7 @@ updateGame msg model =
                 updateModelMsg model
 
             else
-                { model | gameStatus = LoseFadeOut 15 15 } |> noCmd
+                { model | gamePhase = LoseFadeOut 15 15 } |> noCmd
 
         LoseFadeOut time duration ->
             case msg of
@@ -250,7 +250,7 @@ updateGame msg model =
                                 reInit model
 
                             restartModel =
-                                { originalModel | gameStatus = StartFadeIn 0 25 }
+                                { originalModel | gamePhase = StartFadeIn 0 25 }
 
                             restartMsg =
                                 Cmd.batch
@@ -267,7 +267,7 @@ updateGame msg model =
                         ( restartModel, restartMsg )
 
                     else
-                        { model | gameStatus = LoseFadeOut (time - 1) duration } |> noCmd
+                        { model | gamePhase = LoseFadeOut (time - 1) duration } |> noCmd
 
                 MouseDown ->
                     { model | enableMouse = True } |> noCmd
@@ -289,7 +289,7 @@ updateGame msg model =
                 reInit { model | level = newLevel }
 
             else
-                { model | gameStatus = WinFadeOut newLevel 40 40 } |> noCmd
+                { model | gamePhase = WinFadeOut newLevel 40 40 } |> noCmd
 
         WinFadeOut newLevel time duration ->
             case msg of
@@ -298,7 +298,7 @@ updateGame msg model =
                         reInit { model | level = newLevel }
 
                     else
-                        { model | gameStatus = WinFadeOut newLevel (time - 1) duration } |> noCmd
+                        { model | gamePhase = WinFadeOut newLevel (time - 1) duration } |> noCmd
 
                 MouseDown ->
                     { model | enableMouse = True } |> noCmd
@@ -428,7 +428,7 @@ updateModelMsg model =
                         LevelChange (switchLevel model.level)
 
             else
-                model.gameStatus
+                model.gamePhase
 
         cmdMsg =
             if checkGoal then
@@ -444,7 +444,7 @@ updateModelMsg model =
     in
     case model.level of
         5 ->
-            ( { model | gameStatus = newStatus, time = model.time + 1 }
+            ( { model | gamePhase = newStatus, time = model.time + 1 }
                 |> updateBlocks
                 |> updateGEvents
                 |> updateFocalPoint
@@ -456,7 +456,7 @@ updateModelMsg model =
             )
 
         _ ->
-            ( { model | gameStatus = newStatus, time = model.time + 1 }
+            ( { model | gamePhase = newStatus, time = model.time + 1 }
                 |> updateBlocks
                 |> updateGEvents
                 |> updateFocalPoint
@@ -513,8 +513,11 @@ updateLock model =
                     , lamp (Point3d.meters 6 -100 0) 180
                     ]
 
+                center_store =
+                    Point3d.meters 0 40 0
+
                 store =
-                    buildStore (Point 0 40 0)
+                    buildStore center_store
 
                 text1 =
                     text3d "store" (Point3d.meters -3.5 33.3 5) 0.25 { a = 270, b = 0, c = 0 }
@@ -534,7 +537,7 @@ updateLock model =
         --++shade
     in
     if selfY == -99 && model.level6Lock then
-        { model | level6Lock = False, gameStatus = Interlude 0 300 model.camera.elevation model.camera.distance model.camera.azimuth, settings = newSettings }
+        { model | level6Lock = False, gamePhase = Interlude 0 300 model.camera.elevation model.camera.distance model.camera.azimuth, settings = newSettings }
 
     else
         model
@@ -567,14 +570,14 @@ updateInterlude6 time duration originalElevation originalDistance originalAzimut
         newCamera =
             { oldCamera | elevation = newElevation, distance = newDistance, azimuth = newAzimuth }
 
-        newGameStatus =
+        newgamePhase =
             if time >= duration then
                 Play
 
             else
                 Interlude (time + 1) duration originalElevation originalDistance originalAzimuth
     in
-    { model | camera = newCamera, gameStatus = newGameStatus }
+    { model | camera = newCamera, gamePhase = newgamePhase }
 
 
 
@@ -614,7 +617,7 @@ updateLevel5onTime model =
     in
     if model.level == 5 then
         if ifEnd then
-            { model | gameStatus = Lose }
+            { model | gamePhase = Lose }
 
         else
             { model | self = newSelf }
@@ -770,7 +773,7 @@ updateText3dStart model =
             else
                 ( preModel, preModel.texts3d )
 
-        newGameStatus =
+        newgamePhase =
             if texts == preModel.texts3d && modBy period model.time == 0 then
                 Lose
 
@@ -778,10 +781,10 @@ updateText3dStart model =
                 LevelChange 3
 
             else
-                model.gameStatus
+                model.gamePhase
     in
     if model.level == 2 then
-        { model | texts3d = texts, gameStatus = newGameStatus }
+        { model | texts3d = texts, gamePhase = newgamePhase }
 
     else
         model
@@ -807,7 +810,7 @@ updateTexts3d model =
                     )
 
                 3 ->
-                    case model.gameStatus of
+                    case model.gamePhase of
                         Interlude _ _ _ _ _ ->
                             ( List.map (updateText3dPositionAdvanced 200) model.texts3d
                             , List.map (updateText3dPositionAdvanced 200) model.texts3dRev
@@ -819,7 +822,7 @@ updateTexts3d model =
                             )
 
                 4 ->
-                    case model.gameStatus of
+                    case model.gamePhase of
                         Interlude _ _ _ _ _ ->
                             ( List.map (updateText3dPosition 100) model.texts3d
                             , List.map (updateText3dPosition 100) model.texts3dRev
@@ -1089,7 +1092,7 @@ checkReverse model =
             | enableKey = False
             , event = Nothing
             , reverseTimer = model.time
-            , gameStatus = Interlude 0 1200 model.camera.elevation model.camera.distance model.camera.azimuth
+            , gamePhase = Interlude 0 1200 model.camera.elevation model.camera.distance model.camera.azimuth
           }
         , playSound "reverse_long"
         )
@@ -1148,9 +1151,9 @@ updateFrame frame model =
                             Play
 
             else
-                model.gameStatus
+                model.gamePhase
     in
-    { model | frameTime = newFrameTime, gameStatus = newStatus }
+    { model | frameTime = newFrameTime, gamePhase = newStatus }
 
 
 updateAnimation6 : GameState -> Int -> GameState
@@ -1302,7 +1305,7 @@ updateAnimation0 model =
             model.frameTime - 4
     in
     if newFrameTime < 0 then
-        { model | gameStatus = LevelChange 1 }
+        { model | gamePhase = LevelChange 1 }
 
     else
         { model | frameTime = newFrameTime }
@@ -1615,7 +1618,7 @@ updateBlocks model =
             updateBlock model model.self
 
         switchRound =
-            if model.gameStatus == Play then
+            if model.gamePhase == Play then
                 if not (newSelf.center == model.self.center) then
                     False
 
@@ -1671,10 +1674,10 @@ updateCars speed model =
                 ( Lose, model.level3Lock + 1 )
 
             else
-                ( model.gameStatus, model.level3Lock )
+                ( model.gamePhase, model.level3Lock )
     in
     if model.level == 3 then
-        { model | cars = cars, gameStatus = newStatus, level3Lock = newLock }
+        { model | cars = cars, gamePhase = newStatus, level3Lock = newLock }
 
     else
         model
@@ -1951,7 +1954,7 @@ updateInterlude3 time duration originalElevation originalDistance originalAzimut
         newCamera =
             { oldCamera | elevation = newElevation, distance = newDistance, azimuth = newAzimuth }
 
-        ( newGameStatus, newWorld ) =
+        ( newgamePhase, newWorld ) =
             if time >= duration then
                 ( Play, Reversed )
 
@@ -1968,7 +1971,7 @@ updateInterlude3 time duration originalElevation originalDistance originalAzimut
             { content = "They accept me.", top = 65, left = 65, opacity = 0, size = 1, event = { name = Types.Noop, init = 0, duration = 200 } }
 
         newModel =
-            { model | camera = newCamera, gameStatus = newGameStatus, level3Lock = -1, time = model.time + 1, world = newWorld } |> updateCars 0.02 |> updateTexts3d |> updateText
+            { model | camera = newCamera, gamePhase = newgamePhase, level3Lock = -1, time = model.time + 1, world = newWorld } |> updateCars 0.02 |> updateTexts3d |> updateText
 
         newNewModel =
             if time == 200 then
@@ -2035,9 +2038,9 @@ updateInterlude4 time duration originalElevation originalDistance originalAzimut
         newCamera =
             { oldCamera | elevation = newElevation, distance = newDistance, azimuth = newAzimuth, focalPoint = newFocalPoint }
 
-        newGameStatus =
+        newgamePhase =
             if time >= duration then
-                model.gameStatus
+                model.gamePhase
 
             else
                 Interlude (time + 1) duration originalElevation originalDistance originalAzimuth
@@ -2069,10 +2072,10 @@ updateInterlude4 time duration originalElevation originalDistance originalAzimut
 
         newModel =
             if time == 750 then
-                makeText { model | camera = newCamera, gameStatus = newGameStatus, time = model.time + 1, texts3d = newTexts3d, texts3dRev = rev } text1 |> updateTexts3d |> updateText
+                makeText { model | camera = newCamera, gamePhase = newgamePhase, time = model.time + 1, texts3d = newTexts3d, texts3dRev = rev } text1 |> updateTexts3d |> updateText
 
             else
-                { model | camera = newCamera, gameStatus = newGameStatus, time = model.time + 1, texts3d = newTexts3d, texts3dRev = rev } |> updateTexts3d |> updateText
+                { model | camera = newCamera, gamePhase = newgamePhase, time = model.time + 1, texts3d = newTexts3d, texts3dRev = rev } |> updateTexts3d |> updateText
     in
     if time >= duration then
         reInit { model | level = 6 }
@@ -2175,7 +2178,7 @@ updateActiveBlock model block =
         self =
             model.self
     in
-    if block.color == Color.lightRed || (model.level == 1 && model.gameStatus /= Play) then
+    if block.color == Color.lightRed || (model.level == 1 && model.gamePhase /= Play) then
         case block.event of
             Nothing ->
                 if not model.playerRound then
@@ -2240,7 +2243,7 @@ updateActiveBlock model block =
                 block
                     |> updateBlock model
 
-    else if (model.level == 6 || model.level == 1) && model.gameStatus == Play then
+    else if (model.level == 6 || model.level == 1) && model.gamePhase == Play then
         let
             distance =
                 round (Length.inCentimeters (Point3d.distanceFrom block.center (Point3d.meters 10 -10 10)))
@@ -2382,24 +2385,24 @@ examLoseAndWarn key model =
         newStatus =
             case model.level of
                 5 ->
-                    model.gameStatus
+                    model.gamePhase
 
                 6 ->
-                    model.gameStatus
+                    model.gamePhase
 
                 _ ->
-                    if List.any (\block -> examDistance block preSelf (Length.meters 2) (Length.meters 0)) model.actives && model.gameStatus == Play && preSelf.center /= model.goal.center then
+                    if List.any (\block -> examDistance block preSelf (Length.meters 2) (Length.meters 0)) model.actives && model.gamePhase == Play && preSelf.center /= model.goal.center then
                         Lose
 
                     else
-                        model.gameStatus
+                        model.gamePhase
 
         newModel =
             if List.any (\block -> examDistance block preSelf (Length.meters 4) (Length.meters 2.5)) model.actives then
                 if model.text.event.duration == 0 then
                     case model.level of
                         1 ->
-                            if model.gameStatus == Play then
+                            if model.gamePhase == Play then
                                 if modBy 3 model.time == 0 then
                                     makeText model Level1.Text.text1
 
@@ -2420,7 +2423,7 @@ examLoseAndWarn key model =
                                 makeText model Level5.Text.text2
 
                         6 ->
-                            if model.gameStatus == Play then
+                            if model.gamePhase == Play then
                                 if modBy 3 model.time == 0 then
                                     makeText model Level6.Text.text1
 
@@ -2442,7 +2445,7 @@ examLoseAndWarn key model =
             else
                 model
     in
-    { newModel | gameStatus = newStatus }
+    { newModel | gamePhase = newStatus }
 
 
 ifNextStepAvailable : Block -> Direction -> GameState -> Bool
@@ -2538,7 +2541,7 @@ reInit model =
                     Level2.Model.init
 
                 3 ->
-                    case model.gameStatus of
+                    case model.gamePhase of
                         LoseFadeOut _ _ ->
                             let
                                 ( tModel, tMsg ) =
@@ -2652,11 +2655,11 @@ switchLevel level =
 
 updatePause : Bool -> GameState -> GameState
 updatePause bool model =
-    if bool == True && model.gameStatus == Play then
-        { model | gameStatus = Paused }
+    if bool == True && model.gamePhase == Play then
+        { model | gamePhase = Paused }
 
-    else if model.gameStatus == Paused then
-        { model | gameStatus = Play }
+    else if model.gamePhase == Paused then
+        { model | gamePhase = Play }
 
     else
         model

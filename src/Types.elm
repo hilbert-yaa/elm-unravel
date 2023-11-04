@@ -67,9 +67,7 @@ type alias Text =
     }
 
 
-type
-    EventType
-    --TODO
+type EventType
     = Rotate Direction
     | Noop
     | Reverse
@@ -112,13 +110,6 @@ type GamePhase
 type alias GroundSize =
     { l : Float --y
     , w : Float --x
-    }
-
-
-type alias Point =
-    { x : Float
-    , y : Float
-    , z : Float
     }
 
 
@@ -184,23 +175,6 @@ lamp anchor angle =
 road : Point3d Meters WorldCoordinates -> Point3d Meters WorldCoordinates -> Color -> Scene3d.Entity WorldCoordinates
 road point1 point2 color =
     Scene3d.block (Material.matte color) (Block3d.from point1 point2)
-
-
-store : Point -> Entity WorldCoordinates
-store center =
-    let
-        block =
-            Block3d.with
-                { x1 = Length.meters (8 + center.x)
-                , y1 = Length.meters (4 + center.y)
-                , z1 = Length.meters (6 + center.z)
-                , x2 = Length.meters (-8 + center.x)
-                , y2 = Length.meters (-4 + center.y)
-                , z2 = Length.meters (-6 + center.z)
-                }
-    in
-    Scene3d.blockWithShadow (Material.color Color.blue) block
-
 
 
 -- constants

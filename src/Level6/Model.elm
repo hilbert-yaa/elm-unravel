@@ -180,8 +180,6 @@ settings =
             , lamp (Point3d.meters 6 -100 0) 180
             ]
 
-        -- store = buildStore (Point 0 40 0)
-        -- text1 = text3d "store" (Point3d.meters -3.5 33.3 5) 0.25 { a = 270, b = 0, c = 0 }
         road1 =
             Scene3d.block (Material.color Color.white) (Block3d.from (Point3d.meters -4 initY -0.1) (Point3d.meters 2 -141 -100))
 
@@ -280,7 +278,7 @@ init =
       , goal = { center = initGoal }
       , level = 6
       , world = Normal
-      , gameStatus = PreGame 1 600 --600
+      , gamePhase = PreGame 1 600 --600
       , groundSize = groundSize
       , mapSize = mapSize
       , godMode = False
@@ -296,43 +294,3 @@ init =
       }
     , playSound "bgm_6"
     )
-
-
-buildStore : Point -> List (Entity WorldCoordinates)
-buildStore center =
-    let
-        x =
-            center.x
-
-        y =
-            center.y
-
-        z =
-            center.z
-
-        block1 =
-            Block3d.from (Point3d.meters (x - 10) (y - 6) (z + 7)) (Point3d.meters (x + 10) (y + 6) (z + 8))
-
-        block2 =
-            Block3d.from (Point3d.meters (x - 10) (y - 6) z) (Point3d.meters (x - 2) (y - 4) (z + 8))
-
-        block3 =
-            Block3d.from (Point3d.meters (x + 10) (y - 6) z) (Point3d.meters (x + 2) (y - 4) (z + 8))
-
-        block4 =
-            Block3d.from (Point3d.meters (x - 2) (y - 6) (z + 4)) (Point3d.meters (x + 2) (y - 4) (z + 8))
-
-        block5 =
-            Block3d.from (Point3d.meters (x - 10) (y + 6) z) (Point3d.meters (x + 10) (y + 8) (z + 8))
-
-        block6 =
-            Block3d.from (Point3d.meters (x - 10) (y - 6) z) (Point3d.meters (x - 8) (y + 6) (z + 8))
-
-        block7 =
-            Block3d.from (Point3d.meters (x + 8) (y - 6) z) (Point3d.meters (x + 10) (y + 8) (z + 8))
-    in
-    let
-        blocks =
-            List.map (\block -> Scene3d.blockWithShadow (Material.matte Color.gray) block) [ block1, block2, block3, block4, block5, block6, block7 ]
-    in
-    List.foldr List.append [] [ blocks ]

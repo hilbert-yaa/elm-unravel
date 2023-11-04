@@ -5,7 +5,6 @@ import Pixels exposing (Pixels)
 import Quantity exposing (Quantity)
 import Types exposing (Direction)
 
-
 type Msg
     = Resize (Quantity Int Pixels) (Quantity Int Pixels)
     | Scroll Float
@@ -15,7 +14,7 @@ type Msg
     | MouseMove (Quantity Float Pixels) (Quantity Float Pixels)
     | KeyDown Direction
     | Pause Bool
-    | Option String
+    | Option String -- options changes within the in-game menu
     | Switch Int
     | KeyUp
     | Noop
