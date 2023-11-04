@@ -1,7 +1,5 @@
 module Main exposing (..)
 
--- debug
-
 import Browser
 import Model exposing (GameState)
 import Msg exposing (Msg(..))
@@ -14,13 +12,13 @@ import View exposing (view)
 main : Program () GameState Msg
 main =
     Browser.element
-        { init = \_ -> init
+        { init = init
         , view = view
         , update = update
         , subscriptions = subscriptions
         }
 
 
-init : ( GameState, Cmd Msg )
-init =
+init : () -> ( GameState, Cmd Msg )
+init _ =
     Model.init

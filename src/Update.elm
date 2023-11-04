@@ -2566,7 +2566,7 @@ reInit model =
                     Level6.Model.init
 
                 _ ->
-                    Model.init
+                    Debug.todo("reInit: should not happen")
     in
     ( model_, msg )
 
