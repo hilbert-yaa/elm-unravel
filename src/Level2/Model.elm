@@ -12,7 +12,7 @@ import Color exposing (Color)
 import Cylinder3d exposing (..)
 import Direction3d
 import Length exposing (Meters)
-import Model exposing (Model)
+import Model exposing (GameState)
 import Msg exposing (Msg(..))
 import Parameter1d
 import Pixels
@@ -170,7 +170,7 @@ texts3dRev =
     []
 
 
-init : ( Model, Cmd Msg )
+init : ( GameState, Cmd Msg )
 init =
     --整个场景是20*40的，然后方块的边长是2
     let

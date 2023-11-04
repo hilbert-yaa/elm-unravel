@@ -13,7 +13,7 @@ import Cylinder3d exposing (..)
 import Direction3d
 import Length exposing (Meters)
 import Level4.Model exposing (buildLine)
-import Model exposing (Model)
+import Model exposing (GameState)
 import Msg exposing (Msg(..))
 import Parameter1d
 import Pixels
@@ -228,7 +228,7 @@ boundary =
 -- List.concat [l1,l2,l3,l4,l5,l6,l7,l8,l9,l10]
 
 
-init : ( Model, Cmd Msg )
+init : ( GameState, Cmd Msg )
 init =
     -- 方块的边长是2
     let

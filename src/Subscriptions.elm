@@ -3,14 +3,14 @@ module Subscriptions exposing (subscriptions)
 import Browser.Events exposing (..)
 import Duration
 import Json.Decode as Decode exposing (Decoder)
-import Model exposing (Model)
+import Model exposing (GameState)
 import Msg exposing (Msg(..))
 import Pixels exposing (Pixels)
 import Ports exposing (onScroll)
 import Types exposing (Direction(..), EventType(..), WorldType(..))
 
 
-subscriptions : Model -> Sub Msg
+subscriptions : GameState -> Sub Msg
 subscriptions model =
     Sub.batch
         [ onAnimationFrameDelta (Duration.milliseconds >> Tick)

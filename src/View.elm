@@ -13,7 +13,7 @@ import Illuminance exposing (Illuminance)
 import Length
 import Level6.Model exposing (initY)
 import LuminousFlux
-import Model exposing (Model)
+import Model exposing (GameState)
 import Msg exposing (Msg(..))
 import Pixels
 import Plane3d
@@ -30,7 +30,7 @@ import Types exposing (..)
 import Viewpoint3d
 
 
-renderGame : Model -> Html Msg
+renderGame : GameState -> Html Msg
 renderGame model =
     let
         { width, height } =
@@ -241,7 +241,7 @@ renderGame model =
         ]
 
 
-preGameView : Model -> Html Msg
+preGameView : GameState -> Html Msg
 preGameView model =
     let
         fade =
@@ -418,7 +418,7 @@ preGameView model =
                 ]
 
 
-renderText : Model -> Html Msg
+renderText : GameState -> Html Msg
 renderText model =
     let
         content =
@@ -451,7 +451,7 @@ renderText model =
         [ Html.text content ]
 
 
-renderEscMenu : Model -> Html Msg
+renderEscMenu : GameState -> Html Msg
 renderEscMenu model =
     if model.gameStatus == Paused then
         let
@@ -509,7 +509,7 @@ slider step value =
         []
 
 
-view : Model -> Html Msg
+view : GameState -> Html Msg
 view model =
     let
         this =
@@ -581,7 +581,7 @@ view model =
 {- switch light based on levels and world -}
 
 
-switchLight : Model -> Scene3d.Lights coordinates
+switchLight : GameState -> Scene3d.Lights coordinates
 switchLight model =
     case ( model.level, model.world ) of
         ( 0, Normal ) ->

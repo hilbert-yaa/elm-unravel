@@ -12,7 +12,7 @@ import Types exposing (..)
 import Vector3d
 
 
-type alias Model =
+type alias GameState =
     { time : Int
     , screen : ScreenSize
     , camera : CameraOpt
@@ -29,7 +29,7 @@ type alias Model =
     , goal : Goal
     , level : Int
     , world : WorldType
-    , gameStatus : GameStatus
+    , gameStatus : GamePhase
     , groundSize : GroundSize
     , mapSize : GroundSize
     , godMode : Bool
@@ -105,7 +105,7 @@ settings =
             ++ [ text1, text2 ]
 
 
-init : ( Model, Cmd Msg )
+init : ( GameState, Cmd Msg )
 init =
     let
         initCenter =

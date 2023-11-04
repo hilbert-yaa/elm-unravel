@@ -17,7 +17,7 @@ import Level5.Model
 import Level5.Text
 import Level6.Model exposing (buildStore)
 import Level6.Text
-import Model exposing (Model)
+import Model exposing (GameState)
 import Msg exposing (Msg(..))
 import Pixels exposing (Pixels)
 import Point3d exposing (Point3d)
@@ -30,7 +30,7 @@ import Types exposing (..)
 import Vector3d
 
 
-noCmd : Model -> ( Model, Cmd msg )
+noCmd : GameState -> ( GameState, Cmd msg )
 noCmd model =
     ( model, Cmd.none )
 
@@ -39,7 +39,7 @@ noCmd model =
 -- preUpdate
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
+update : Msg -> GameState -> ( GameState, Cmd Msg )
 update msg model =
     case msg of
         Resize w h ->
@@ -95,7 +95,7 @@ update msg model =
             updateGame msg model
 
 
-updateGame : Msg -> Model -> ( Model, Cmd Msg )
+updateGame : Msg -> GameState -> ( GameState, Cmd Msg )
 updateGame msg model =
     case model.gameStatus of
         Paused ->
@@ -371,7 +371,7 @@ updateGame msg model =
 {- update when pressing WASD -}
 
 
-updateWhenMove : Direction -> Model -> Model
+updateWhenMove : Direction -> GameState -> GameState
 updateWhenMove key model =
     if model.playerRound && ifNextStepAvailable model.self key model then
         model
@@ -383,7 +383,7 @@ updateWhenMove key model =
         model
 
 
-updateModelMsg : Model -> ( Model, Cmd Msg )
+updateModelMsg : GameState -> ( GameState, Cmd Msg )
 updateModelMsg model =
     let
         point =
@@ -481,7 +481,7 @@ updateModelMsg model =
 ----------level 6----------
 
 
-updateLevel6 : Model -> Model
+updateLevel6 : GameState -> GameState
 updateLevel6 model =
     if model.level /= 6 then
         model
@@ -495,7 +495,7 @@ updateLevel6 model =
 -- |> updateCamera6
 
 
-updateLock : Model -> Model
+updateLock : GameState -> GameState
 updateLock model =
     let
         selfY =
@@ -544,7 +544,7 @@ updateLock model =
         model
 
 
-updateInterlude6 : Float -> Float -> Angle -> Length -> Angle -> Model -> Model
+updateInterlude6 : Float -> Float -> Angle -> Length -> Angle -> GameState -> GameState
 updateInterlude6 time duration originalElevation originalDistance originalAzimuth model =
     let
         ratio =
@@ -586,13 +586,13 @@ updateInterlude6 time duration originalElevation originalDistance originalAzimut
 -----------------level 5 update-----------------
 
 
-updateLevel5 : Model -> Model
+updateLevel5 : GameState -> GameState
 updateLevel5 model =
     model
         |> updateLevel5onTime
 
 
-updateLevel5onTime : Model -> Model
+updateLevel5onTime : GameState -> GameState
 updateLevel5onTime model =
     let
         self =
@@ -653,7 +653,7 @@ level5ChangeColor rate color =
 -----------------level 0 text-----------------
 
 
-updateLevel0Text : Model -> Model
+updateLevel0Text : GameState -> GameState
 updateLevel0Text model =
     let
         t =
@@ -680,7 +680,7 @@ updateLevel0Text model =
 -----------------level 3 text-----------------
 
 
-updateLevel3Text : Model -> Model
+updateLevel3Text : GameState -> GameState
 updateLevel3Text model =
     let
         t =
@@ -716,7 +716,7 @@ updateLevel3Text model =
 -----------------level2.textfall----------
 
 
-updateBackground : Model -> Model
+updateBackground : GameState -> GameState
 updateBackground model =
     let
         scene =
@@ -738,7 +738,7 @@ updateBackground model =
         model
 
 
-updateText3dStart : Model -> Model
+updateText3dStart : GameState -> GameState
 updateText3dStart model =
     let
         dirSelf =
@@ -795,7 +795,7 @@ updateText3dStart model =
 -----------------level2.textfall----------
 
 
-updateTexts3d : Model -> Model
+updateTexts3d : GameState -> GameState
 updateTexts3d model =
     let
         ( newTexts3d, newTexts3dRev ) =
@@ -1009,12 +1009,12 @@ updateText3dPositionAdvancedRot duration text3d =
         { text3d | time = text3d.time + 1, entities = newEntities }
 
 
-updateKeyEvent : Direction -> Model -> Model
+updateKeyEvent : Direction -> GameState -> GameState
 updateKeyEvent key model =
     { model | self = keyToEvent key model.time model.self }
 
 
-examTextFall : Direction -> Model -> Model
+examTextFall : Direction -> GameState -> GameState
 examTextFall key model =
     case model.level of
         2 ->
@@ -1053,7 +1053,7 @@ examTextFall key model =
             { model | texts3d = texts, texts3dRev = textsRev }
 
 
-editTextHelper : Text3d -> ( Model, List Text3d ) -> ( Model, List Text3d )
+editTextHelper : Text3d -> ( GameState, List Text3d ) -> ( GameState, List Text3d )
 editTextHelper text3d ( model, list ) =
     if text3d.time == -1 && List.any (\block -> examDistance block model.self (Length.meters 2.2) (Length.meters 1.9)) text3d.wall then
         ( model, list ++ [ { text3d | time = 0 } ] )
@@ -1062,7 +1062,7 @@ editTextHelper text3d ( model, list ) =
         ( model, list ++ [ text3d ] )
 
 
-editTextHelper6 : Text3d -> ( Model, List Text3d ) -> ( Model, List Text3d )
+editTextHelper6 : Text3d -> ( GameState, List Text3d ) -> ( GameState, List Text3d )
 editTextHelper6 text3d ( model, list ) =
     if text3d.time == -1 && List.any (\block -> examDistance block model.self (Length.meters 10) (Length.meters 1.9)) text3d.wall then
         ( model, list ++ [ { text3d | time = 0 } ] )
@@ -1071,7 +1071,7 @@ editTextHelper6 text3d ( model, list ) =
         ( model, list ++ [ text3d ] )
 
 
-checkReverse : Model -> ( Model, Cmd Msg )
+checkReverse : GameState -> ( GameState, Cmd Msg )
 checkReverse model =
     if (model.level >= 3 || model.level == 0) && (model.level3Lock == -1) && model.level <= 5 && model.event == Nothing && ifNextStepAvailable model.self R model && (model.reverseTimer + 60) <= model.time then
         ( { model
@@ -1102,7 +1102,7 @@ checkReverse model =
         { model | enableKey = False } |> noCmd
 
 
-findFallText : Text3d -> ( Model, List Text3d ) -> ( Model, List Text3d )
+findFallText : Text3d -> ( GameState, List Text3d ) -> ( GameState, List Text3d )
 findFallText text3d ( model, list ) =
     if
         text3d.time
@@ -1117,7 +1117,7 @@ findFallText text3d ( model, list ) =
         ( model, list ++ [ text3d ] )
 
 
-updateFrame : Int -> Model -> Model
+updateFrame : Int -> GameState -> GameState
 updateFrame frame model =
     let
         newFrameTime =
@@ -1157,7 +1157,7 @@ updateFrame frame model =
     { model | frameTime = newFrameTime, gameStatus = newStatus }
 
 
-updateAnimation6 : Model -> Int -> Model
+updateAnimation6 : GameState -> Int -> GameState
 updateAnimation6 model frame =
     let
         newTime =
@@ -1194,7 +1194,7 @@ updateAnimation6 model frame =
 ---------- Level1 Animation ----------
 
 
-updateAnimation1 : Model -> Int -> ( Model, Cmd Msg )
+updateAnimation1 : GameState -> Int -> ( GameState, Cmd Msg )
 updateAnimation1 model frame =
     let
         newTime =
@@ -1267,7 +1267,7 @@ updateAnimation1 model frame =
 ---------- Level4 Animation ----------
 
 
-updateAnimation4 : Model -> Int -> Model
+updateAnimation4 : GameState -> Int -> GameState
 updateAnimation4 model frame =
     let
         newTime =
@@ -1299,7 +1299,7 @@ updateAnimation4 model frame =
 ---------- Start page ----------
 
 
-updateAnimation0 : Model -> Model
+updateAnimation0 : GameState -> GameState
 updateAnimation0 model =
     let
         newFrameTime =
@@ -1316,7 +1316,7 @@ updateAnimation0 model =
 ---------- Start page ----------
 
 
-updateFocalPoint : Model -> Model
+updateFocalPoint : GameState -> GameState
 updateFocalPoint model =
     if model.godMode then
         model
@@ -1366,7 +1366,7 @@ updateFocalPoint model =
 ----------level1 warning----------
 
 
-updateWarning : Model -> Model
+updateWarning : GameState -> GameState
 updateWarning model =
     case model.level of
         1 ->
@@ -1478,7 +1478,7 @@ blockDistance block1 block2 =
     Point3d.distanceFrom (Block3d.centerPoint block1.this) (Block3d.centerPoint block2.this)
 
 
-updateElevationAzimuth : Quantity.Quantity Float Pixels -> Quantity.Quantity Float Pixels -> Model -> Model
+updateElevationAzimuth : Quantity.Quantity Float Pixels -> Quantity.Quantity Float Pixels -> GameState -> GameState
 updateElevationAzimuth dx dy model =
     let
         camRate =
@@ -1521,7 +1521,7 @@ updateElevationAzimuth dx dy model =
 {- update key according to camera -}
 
 
-updateKey : Direction -> Model -> Direction
+updateKey : Direction -> GameState -> Direction
 updateKey key model =
     let
         azimuth =
@@ -1584,7 +1584,7 @@ updateKey key model =
 {- update active blocks -}
 
 
-updateActives : Model -> Model
+updateActives : GameState -> GameState
 updateActives model =
     let
         updateActiveBlocks =
@@ -1612,7 +1612,7 @@ updateActives model =
     { newModel | text = model.text }
 
 
-updateBlocks : Model -> Model
+updateBlocks : GameState -> GameState
 updateBlocks model =
     let
         newSelf =
@@ -1640,7 +1640,7 @@ updateBlocks model =
 --------------car--------------
 
 
-updateCars : Float -> Model -> Model
+updateCars : Float -> GameState -> GameState
 updateCars speed model =
     let
         cars1 =
@@ -1684,7 +1684,7 @@ updateCars speed model =
         model
 
 
-updateCarsInLine : List Block -> Model -> Point3d Meters WorldCoordinates -> Point3d Meters WorldCoordinates -> Direction -> Float -> List Block
+updateCarsInLine : List Block -> GameState -> Point3d Meters WorldCoordinates -> Point3d Meters WorldCoordinates -> Direction -> Float -> List Block
 updateCarsInLine cars model begin end dir speed =
     let
         createdCars =
@@ -1826,12 +1826,12 @@ deleteCar car point1 point2 =
     not (x >= x1 && x <= x2 && y >= y1 && y <= y2)
 
 
-moveCars : List Block -> Float -> Model -> List Block
+moveCars : List Block -> Float -> GameState -> List Block
 moveCars cars speed model =
     List.map (\car -> moveCar car cars speed model) cars
 
 
-moveCar : Block -> List Block -> Float -> Model -> Block
+moveCar : Block -> List Block -> Float -> GameState -> Block
 moveCar car cars speed model =
     let
         event =
@@ -1918,7 +1918,7 @@ moveCar car cars speed model =
 ----------level 3----------
 
 
-updateInterlude3 : Float -> Float -> Angle -> Length -> Angle -> Model -> Model
+updateInterlude3 : Float -> Float -> Angle -> Length -> Angle -> GameState -> GameState
 updateInterlude3 time duration originalElevation originalDistance originalAzimuth model =
     let
         ratio =
@@ -1995,7 +1995,7 @@ updateInterlude3 time duration originalElevation originalDistance originalAzimut
 ----------level 4----------
 
 
-updateInterlude4 : Float -> Float -> Angle -> Length -> Angle -> Model -> ( Model, Cmd Msg )
+updateInterlude4 : Float -> Float -> Angle -> Length -> Angle -> GameState -> ( GameState, Cmd Msg )
 updateInterlude4 time duration originalElevation originalDistance originalAzimuth model =
     let
         ratio =
@@ -2089,7 +2089,7 @@ updateInterlude4 time duration originalElevation originalDistance originalAzimut
 ----------level 4----------
 
 
-updateGEvents : Model -> Model
+updateGEvents : GameState -> GameState
 updateGEvents model =
     case model.event of
         Nothing ->
@@ -2170,7 +2170,7 @@ updateGEvents model =
 {- define different colored active blocks' behavior -}
 
 
-updateActiveBlock : Model -> Block -> Block
+updateActiveBlock : GameState -> Block -> Block
 updateActiveBlock model block =
     let
         time =
@@ -2328,7 +2328,7 @@ reverseDir dir =
             dir
 
 
-updateBlock : Model -> Block -> Block
+updateBlock : GameState -> Block -> Block
 updateBlock model block =
     let
         time =
@@ -2373,7 +2373,7 @@ examDistance block1 block2 max min =
     Quantity.lessThanOrEqualTo max distance && Quantity.greaterThanOrEqualTo min distance
 
 
-examLoseAndWarn : Direction -> Model -> Model
+examLoseAndWarn : Direction -> GameState -> GameState
 examLoseAndWarn key model =
     let
         preSelf =
@@ -2449,7 +2449,7 @@ examLoseAndWarn key model =
     { newModel | gameStatus = newStatus }
 
 
-ifNextStepAvailable : Block -> Direction -> Model -> Bool
+ifNextStepAvailable : Block -> Direction -> GameState -> Bool
 ifNextStepAvailable block dir model =
     if dir == R then
         let
@@ -2530,7 +2530,7 @@ turn camera =
     { camera | elevation = newElevation }
 
 
-reInit : Model -> ( Model, Cmd Msg )
+reInit : GameState -> ( GameState, Cmd Msg )
 reInit model =
     let
         ( model_, msg ) =
@@ -2571,7 +2571,7 @@ reInit model =
     ( model_, msg )
 
 
-updateText : Model -> Model
+updateText : GameState -> GameState
 updateText model =
     let
         textNow =
@@ -2613,7 +2613,7 @@ updateText model =
         { model | text = textUpdated }
 
 
-makeText : Model -> Text -> Model
+makeText : GameState -> Text -> GameState
 makeText model text =
     let
         newEvent =
@@ -2654,7 +2654,7 @@ switchLevel level =
 ----------- Pause Game -----------
 
 
-updatePause : Bool -> Model -> Model
+updatePause : Bool -> GameState -> GameState
 updatePause bool model =
     if bool == True && model.gameStatus == Play then
         { model | gameStatus = Paused }

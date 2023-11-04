@@ -12,7 +12,7 @@ import Color exposing (Color)
 import Cylinder3d exposing (..)
 import Direction3d
 import Length exposing (Meters)
-import Model exposing (Model)
+import Model exposing (GameState)
 import Msg exposing (Msg(..))
 import Pixels
 import Point3d exposing (Point3d, coordinates, xCoordinate, yCoordinate, zCoordinate)
@@ -168,7 +168,7 @@ settings =
             ++ roads
 
 
-init : ( Model, Cmd Msg )
+init : ( GameState, Cmd Msg )
 init =
     -- 方块的边长是2
     let

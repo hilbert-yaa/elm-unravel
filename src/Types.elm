@@ -20,7 +20,7 @@ import Vector3d
 
 
 type WorldCoordinates
-    = WorldCoordinates
+    = Dummy
 
 
 type alias ScreenSize =
@@ -38,7 +38,6 @@ type alias CameraOpt =
 
 
 type alias Block =
-    --TODO
     { this : Block3d Meters WorldCoordinates
     , center : Point3d Meters WorldCoordinates
     , color : Color
@@ -52,7 +51,6 @@ type alias Goal =
 
 
 type alias Event =
-    --TODO
     { name : EventType
     , init : Int
     , duration : Int
@@ -96,7 +94,7 @@ type WorldType
     | Reversed
 
 
-type GameStatus
+type GamePhase
     = LevelChange Int
     | Animation Int
     | Paused
