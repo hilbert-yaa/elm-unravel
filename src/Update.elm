@@ -5,6 +5,7 @@ import Axis3d
 import Block3d
 import Browser.Dom
 import Color exposing (Color)
+import Common exposing (noCmd)
 import Direction3d
 import Event exposing (keyToEvent, rotateBlock, stampBlock, updateEvent)
 import Length exposing (Length, Meters)
@@ -28,11 +29,6 @@ import SketchPlane3d
 import Task
 import Types exposing (..)
 import Vector3d
-
-
-noCmd : GameState -> ( GameState, Cmd msg )
-noCmd model =
-    ( model, Cmd.none )
 
 
 
@@ -2566,7 +2562,7 @@ reInit model =
                     Level6.Model.init
 
                 _ ->
-                    Debug.todo("reInit: should not happen")
+                    Debug.todo "reInit: should not happen"
     in
     ( model_, msg )
 

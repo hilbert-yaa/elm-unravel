@@ -3,7 +3,7 @@ module Msg exposing (Msg(..))
 import Duration exposing (Duration)
 import Pixels exposing (Pixels)
 import Quantity exposing (Quantity)
-import Types exposing (Direction, SceneSettings)
+import Types exposing (Direction)
 
 
 type Msg

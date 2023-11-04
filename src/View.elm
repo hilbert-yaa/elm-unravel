@@ -1,28 +1,24 @@
 module View exposing (view)
 
 import Angle
-import Block3d exposing (Block3d)
-import Browser
+import Block3d
 import Camera3d
 import Color
 import Direction3d
-import Html exposing (Html, br, button, div, h1, img, input, p, text)
-import Html.Attributes exposing (alt, id, list, src, step, style, type_, value)
+import Html exposing (Html, br, div, h1, input, p, text)
+import Html.Attributes exposing (alt, list, src, step, style, type_, value)
 import Html.Events exposing (onClick, onInput)
-import Illuminance exposing (Illuminance)
+import Illuminance
 import Length
 import Level6.Model exposing (initY)
 import LuminousFlux
 import Model exposing (GameState)
 import Msg exposing (Msg(..))
-import Pixels
-import Plane3d
 import Point3d
 import Quantity
 import Scene3d
 import Scene3d.Light as Light
 import Scene3d.Material as Material
-import Sphere3d
 import String
 import Temperature
 import Text3d exposing (t)
